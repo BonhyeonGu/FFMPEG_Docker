@@ -1,0 +1,36 @@
+version: "3"
+services:
+  ffmpeg_cuda:
+    tty: true
+    stdin_open: true
+    container_name: ffmpeg_cuda
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    ports:
+      - "12005:12005"
+    environment:
+        TZ: "Asia/Seoul"
+    depends_on:
+      - rtsp_srv1
+    links:
+      - rtsp_srv1
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu, utility, compute, video]
+
+  rtsp_srv1:
+    tty: true
+    stdin_open: true
+    container_name: rtsp_srv1
+    restart: always
+    image: aler9/rtsp-simple-server
+    ports:
+      - "12000:8554"
+    environment:
+        TZ: "Asia/Seoul"

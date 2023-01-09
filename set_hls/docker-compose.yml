@@ -1,0 +1,48 @@
+version: "3"
+services:
+  ffmpeg_cuda:
+    tty: true
+    stdin_open: true
+    container_name: ffmpeg_cuda2
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile-ffmpeg
+    ports:
+      - "12005:12005"
+    environment:
+        TZ: "Asia/Seoul"
+    volumes:
+      - ./streams:/root/ffmpeg/streams
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu, utility, compute, video]
+  hls_srv1:
+    tty: true
+    stdin_open: true
+    container_name: hls_srv1
+    restart: always
+    build:
+      context: .
+      dockerfile: ./Dockerfile-hls_server
+    ports:
+      - "12000:4000"
+    environment:
+        TZ: "Asia/Seoul"
+    volumes:
+      - ./streams:/usr/src/app/hls_srv/server/streams
+
+#  rtsp_srv1:
+#    tty: true
+#    stdin_open: true
+#    container_name: rtsp_srv1
+#    restart: always
+#    image: aler9/rtsp-simple-server
+#    ports:
+#      - "12000:8554"
+#    environment:
+#        TZ: "Asia/Seoul"
